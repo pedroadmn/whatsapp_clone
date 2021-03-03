@@ -17,6 +17,8 @@ import config.FirebaseConfig;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
 
+import static helper.Base64Custom.encodeBase64;
+
 public class SignupActivity extends AppCompatActivity {
 
     private TextInputEditText tieSignupName;
@@ -73,6 +75,15 @@ public class SignupActivity extends AppCompatActivity {
                     if(task.isSuccessful()) {
                         Toast.makeText(this, "Successfully registered", Toast.LENGTH_SHORT).show();
                         finish();
+
+                        try {
+                            String userId = encodeBase64(user.getEmail());
+                            user.setUid(userId);
+                            user.save();
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+
                     } else {
                         String exceptionMessage = "";
                         try {
