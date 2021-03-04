@@ -41,6 +41,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:20.0.3'
     implementation 'com.google.firebase:firebase-database:19.6.0'
     implementation 'com.google.firebase:firebase-storage:19.2.1'
+    implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
 
     implementation 'com.ogaclejapan.smarttablayout:library:2.0.0@aar'
 

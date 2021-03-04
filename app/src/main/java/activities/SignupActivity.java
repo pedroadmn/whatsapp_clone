@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.database.DatabaseReference;
 
 import config.FirebaseConfig;
+import helper.FirebaseUserHelper;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
 
@@ -74,6 +75,7 @@ public class SignupActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if(task.isSuccessful()) {
                         Toast.makeText(this, "Successfully registered", Toast.LENGTH_SHORT).show();
+                        FirebaseUserHelper.updateUsername(user.getName());
                         finish();
 
                         try {

@@ -14,20 +14,22 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.FirebaseAuth;
+import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 
 import config.FirebaseConfig;
-import helper.FirebaseUser;
+import helper.FirebaseUserHelper;
 import helper.Permission;
 import pedroadmn.whatsappclone.com.R;
 
@@ -41,6 +43,7 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageButton ibCamera;
     private ImageButton ibGallery;
     private ImageView civProfileImage;
+    private EditText etProfileName;
 
     private static final int CAMERA_SELECTION = 100;
     private static final int GALLERY_SELECTION = 200;
@@ -54,15 +57,29 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         storageReference = FirebaseConfig.getFirebaseStorage();
-        userId = FirebaseUser.getUserId();
+        userId = FirebaseUserHelper.getUserId();
 
         ibCamera = findViewById(R.id.ibCamera);
         ibGallery = findViewById(R.id.ibGallery);
         civProfileImage = findViewById(R.id.civProfileImage);
+        etProfileName = findViewById(R.id.etProfileName);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
+
+        FirebaseUser user = FirebaseUserHelper.getCurrentUser();
+        Uri photoUrl = user.getPhotoUrl();
+
+        if (photoUrl == null) {
+            civProfileImage.setImageResource(R.drawable.padrao);
+        } else {
+            Glide.with(this)
+                    .load(photoUrl)
+                    .into(civProfileImage);
+        }
+
+        etProfileName.setText(user.getDisplayName());
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -137,7 +154,7 @@ public class SettingsActivity extends AppCompatActivity {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
                     byte[] imageData = baos.toByteArray();
 
-                    StorageReference imageRef = storageReference
+                    final StorageReference imageRef = storageReference
                             .child("images")
                             .child("perfil")
                             .child(userId + ".jpeg");
@@ -147,18 +164,23 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(SettingsActivity.this, "Error on upload image", Toast.LENGTH_SHORT).show();
                     })
                     .addOnSuccessListener(taskSnapshot -> {
-                        Toast.makeText(SettingsActivity.this, "Successfully uploaded", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SettingsActivity.this, "Photo Successfully uploaded", Toast.LENGTH_SHORT).show();
+                        imageRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Uri> task) {
+                                Uri url = task.getResult();
+                                updateUserPhoto(url);
+                            }
+                        });
                     });
                 }
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
-
-            if (requestCode == CAMERA_SELECTION) {
-
-            } else if (requestCode == GALLERY_SELECTION) {
-
-            }
         }
+    }
+
+    private void updateUserPhoto(Uri url) {
+        FirebaseUserHelper.updateUserPhoto(url);
     }
 }
