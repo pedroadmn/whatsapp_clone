@@ -16,7 +16,18 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+
+import config.FirebaseConfig;
+import helper.FirebaseUser;
 import helper.Permission;
 import pedroadmn.whatsappclone.com.R;
 
@@ -34,10 +45,16 @@ public class SettingsActivity extends AppCompatActivity {
     private static final int CAMERA_SELECTION = 100;
     private static final int GALLERY_SELECTION = 200;
 
+    private StorageReference storageReference;
+    private String userId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
+
+        storageReference = FirebaseConfig.getFirebaseStorage();
+        userId = FirebaseUser.getUserId();
 
         ibCamera = findViewById(R.id.ibCamera);
         ibGallery = findViewById(R.id.ibGallery);
@@ -115,6 +132,23 @@ public class SettingsActivity extends AppCompatActivity {
 
                 if (bitmap != null) {
                     civProfileImage.setImageBitmap(bitmap);
+
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+                    byte[] imageData = baos.toByteArray();
+
+                    StorageReference imageRef = storageReference
+                            .child("images")
+                            .child("perfil")
+                            .child(userId + ".jpeg");
+
+                    UploadTask uploadTask = imageRef.putBytes(imageData);
+                    uploadTask.addOnFailureListener(e -> {
+                        Toast.makeText(SettingsActivity.this, "Error on upload image", Toast.LENGTH_SHORT).show();
+                    })
+                    .addOnSuccessListener(taskSnapshot -> {
+                        Toast.makeText(SettingsActivity.this, "Successfully uploaded", Toast.LENGTH_SHORT).show();
+                    });
                 }
             } catch (Exception exception) {
                 exception.printStackTrace();

@@ -18,8 +18,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/civProfileImage"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="210dp"
+        android:layout_height="210dp"
         android:src="@drawable/padrao"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
