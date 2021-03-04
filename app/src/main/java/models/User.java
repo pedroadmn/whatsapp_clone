@@ -3,7 +3,11 @@ package models;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Exclude;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import config.FirebaseConfig;
+import helper.FirebaseUserHelper;
 
 public class User {
 
@@ -11,6 +15,7 @@ public class User {
     private String name;
     private String email;
     private String password;
+    private String photo;
 
     public User() {
 
@@ -50,9 +55,37 @@ public class User {
         this.password = password;
     }
 
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
     public void save() {
         DatabaseReference firebaseRef = FirebaseConfig.getFirebaseDatabase();
         DatabaseReference userRef = firebaseRef.child("users").child(getUid());
         userRef.setValue(this);
+    }
+
+    public void update() {
+        String userId = FirebaseUserHelper.getUserId();
+        DatabaseReference databaseRef = FirebaseConfig.getFirebaseDatabase();
+
+        DatabaseReference userRef = databaseRef.child("users")
+                .child(userId);
+
+        userRef.updateChildren(convertToMap());
+    }
+
+    @Exclude
+    public Map<String, Object> convertToMap() {
+        HashMap<String, Object> userMap = new HashMap<>();
+        userMap.put("email", getEmail());
+        userMap.put("name", getName());
+        userMap.put("photo", getPhoto());
+
+        return userMap;
     }
 }

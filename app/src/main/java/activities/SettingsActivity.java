@@ -31,6 +31,7 @@ import java.io.ByteArrayOutputStream;
 import config.FirebaseConfig;
 import helper.FirebaseUserHelper;
 import helper.Permission;
+import models.User;
 import pedroadmn.whatsappclone.com.R;
 
 public class SettingsActivity extends AppCompatActivity {
@@ -44,12 +45,14 @@ public class SettingsActivity extends AppCompatActivity {
     private ImageButton ibGallery;
     private ImageView civProfileImage;
     private EditText etProfileName;
+    private ImageView ivEdit;
 
     private static final int CAMERA_SELECTION = 100;
     private static final int GALLERY_SELECTION = 200;
 
     private StorageReference storageReference;
     private String userId;
+    private User loggedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +61,13 @@ public class SettingsActivity extends AppCompatActivity {
 
         storageReference = FirebaseConfig.getFirebaseStorage();
         userId = FirebaseUserHelper.getUserId();
+        loggedUser = FirebaseUserHelper.getLoggeduserInfo();
 
         ibCamera = findViewById(R.id.ibCamera);
         ibGallery = findViewById(R.id.ibGallery);
         civProfileImage = findViewById(R.id.civProfileImage);
         etProfileName = findViewById(R.id.etProfileName);
+        ivEdit = findViewById(R.id.ivEdit);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Settings");
@@ -87,6 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         ibCamera.setOnClickListener(v -> openCamera());
         ibGallery.setOnClickListener(v -> openGallery());
+        ivEdit.setOnClickListener(v -> updateUsername());
     }
 
     @Override
@@ -165,12 +171,9 @@ public class SettingsActivity extends AppCompatActivity {
                     })
                     .addOnSuccessListener(taskSnapshot -> {
                         Toast.makeText(SettingsActivity.this, "Photo Successfully uploaded", Toast.LENGTH_SHORT).show();
-                        imageRef.getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Uri> task) {
-                                Uri url = task.getResult();
-                                updateUserPhoto(url);
-                            }
+                        imageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                            Uri url = task.getResult();
+                            updateUserPhoto(url);
                         });
                     });
                 }
@@ -181,6 +184,23 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     private void updateUserPhoto(Uri url) {
-        FirebaseUserHelper.updateUserPhoto(url);
+        boolean result = FirebaseUserHelper.updateUserPhoto(url);
+
+        if (result) {
+            loggedUser.setPhoto(url.toString());
+            loggedUser.update();
+
+            Toast.makeText(SettingsActivity.this, "The photo was updated", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void updateUsername() {
+        String name = etProfileName.getText().toString();
+        boolean result = FirebaseUserHelper.updateUsername(name);
+        if (result) {
+            loggedUser.setName(name);
+            loggedUser.update();
+            Toast.makeText(SettingsActivity.this, "Name Successfully updated", Toast.LENGTH_SHORT).show();
+        }
     }
 }

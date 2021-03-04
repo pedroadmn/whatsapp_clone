@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
 import config.FirebaseConfig;
+import models.User;
 
 public class FirebaseUserHelper {
 
@@ -58,5 +59,21 @@ public class FirebaseUserHelper {
             exception.printStackTrace();
             return false;
         }
+    }
+
+    public static User getLoggeduserInfo() {
+        FirebaseUser firebaseUser = getCurrentUser();
+
+        User user = new User();
+        user.setEmail(firebaseUser.getEmail());
+        user.setName(firebaseUser.getDisplayName());
+
+        if (firebaseUser.getPhotoUrl() == null) {
+            user.setPhoto("");
+        } else {
+            user.setPhoto(firebaseUser.getPhotoUrl().toString());
+        }
+
+        return user;
     }
 }
