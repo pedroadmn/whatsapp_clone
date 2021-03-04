@@ -6,8 +6,8 @@
         android:name="android.hardware.camera2"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -16,8 +16,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="activities.SettingsActivity"
+        <activity
+            android:name="activities.ChatActivity"
             android:parentActivityName="activities.MainActivity"/>
+        <activity
+            android:name="activities.SettingsActivity"
+            android:parentActivityName="activities.MainActivity" />
         <activity android:name="activities.SignupActivity" />
         <activity android:name="activities.MainActivity" />
         <activity android:name="activities.LoginActivity">
