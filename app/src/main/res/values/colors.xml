@@ -4,4 +4,5 @@
     <color name="colorPrimaryDark">#054d44</color>
     <color name="colorAccent">#25d366</color>
     <color name="grey">#EEEEEE</color>
+    <color name="senderBallon">#DBF9C4</color>
 </resources>
