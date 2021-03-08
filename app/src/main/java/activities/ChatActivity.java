@@ -118,7 +118,11 @@ public class ChatActivity extends AppCompatActivity {
             message.setUserId(senderUserId);
             message.setMessage(textMessage);
 
+            // Save message to sender on firebase
             saveMessage(senderUserId, recipientUserId, message);
+
+            // Save message to recipient on firebase
+            saveMessage(recipientUserId, senderUserId, message);
         } else {
             Toast.makeText(this, "Type a message to send.", Toast.LENGTH_SHORT).show();
         }
