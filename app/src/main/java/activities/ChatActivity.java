@@ -38,6 +38,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import helper.Base64Custom;
 import helper.FirebaseUserHelper;
 import models.Message;
+import models.Talk;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
 
@@ -138,6 +139,8 @@ public class ChatActivity extends AppCompatActivity {
 
             // Save message to recipient on firebase
             saveMessage(recipientUserId, senderUserId, message);
+
+            saveTalk(message);
         } else {
             Toast.makeText(this, "Type a message to send.", Toast.LENGTH_SHORT).show();
         }
@@ -257,5 +260,14 @@ public class ChatActivity extends AppCompatActivity {
                         });
             }
         }
+    }
+
+    private void saveTalk(Message message) {
+        Talk talk = new Talk();
+        talk.setSenderId(senderUserId);
+        talk.setRecipientId(recipientUserId);
+        talk.setLastMessage(message.getMessage());
+        talk.setUser(recipientUser);
+        talk.save();
     }
 }
