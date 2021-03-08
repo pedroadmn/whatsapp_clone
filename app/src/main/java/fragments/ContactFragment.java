@@ -65,7 +65,10 @@ public class ContactFragment extends Fragment {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
+                        User selectedContact = contactList.get(position);
+
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
+                        intent.putExtra("chatContact", selectedContact);
                         startActivity(intent);
                     }
 
