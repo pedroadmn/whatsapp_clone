@@ -22,6 +22,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import activities.ChatActivity;
 import adapters.ContactAdapter;
@@ -141,5 +142,28 @@ public class TalkFragment extends Fragment {
         super.onStop();
 
         talkRef.removeEventListener(childEventListenerTalks);
+    }
+
+    public void searchTalks(String searchText) {
+        List<Talk> searchTalkList = new ArrayList<>();
+
+        for (Talk talk : talkList) {
+            String name = talk.getUser().getName().toLowerCase();
+            String lastMessage = talk.getLastMessage().toLowerCase();
+
+            if (name.contains(searchText) || lastMessage.contains(searchText)) {
+                searchTalkList.add(talk);
+            }
+        }
+
+        talkAdapter = new TalkAdapter(getActivity(), searchTalkList);
+        rvTalks.setAdapter(talkAdapter);
+        talkAdapter.notifyDataSetChanged();
+    }
+
+    public void reloadTalks() {
+        talkAdapter = new TalkAdapter(getActivity(), talkList);
+        rvTalks.setAdapter(talkAdapter);
+        talkAdapter.notifyDataSetChanged();
     }
 }

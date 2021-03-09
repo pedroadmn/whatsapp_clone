@@ -12,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItemAdapter;
 import com.ogaclejapan.smarttablayout.utils.v4.FragmentPagerItems;
@@ -24,6 +25,7 @@ import pedroadmn.whatsappclone.com.R;
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
+    private MaterialSearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +51,49 @@ public class MainActivity extends AppCompatActivity {
 
         SmartTabLayout smartTabLayout = findViewById(R.id.smartTabLayout);
         smartTabLayout.setViewPager(viewPager);
+
+        searchView = findViewById(R.id.svMain);
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+                TalkFragment talkFragment = (TalkFragment) fragmentAdapter.getPage(0);
+                talkFragment.reloadTalks();
+            }
+        });
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                TalkFragment talkFragment = (TalkFragment) fragmentAdapter.getPage(0);
+
+                if (newText != null && !newText.isEmpty()) {
+                    talkFragment.searchTalks(newText.toLowerCase());
+                }
+
+                return true;
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater= getMenuInflater();
         inflater.inflate(R.menu.main_menu, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.searchMenu);
+        searchView.setMenuItem(searchItem);
+
         return super.onCreateOptionsMenu(menu);
     }
 
