@@ -1,5 +1,6 @@
 package activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -17,13 +18,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.View;
+import android.widget.AdapterView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import adapters.ContactAdapter;
+import adapters.SelectedGroupAdapter;
 import config.FirebaseConfig;
 import helper.FirebaseUserHelper;
+import helper.RecyclerItemClickListener;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
 
@@ -33,12 +37,16 @@ public class GroupActivity extends AppCompatActivity {
     private RecyclerView rvMembers;
 
     private ContactAdapter contactAdapter;
+    private SelectedGroupAdapter selectedGroupAdapter;
     private List<User> memberList = new ArrayList<>();
+    private List<User> selectedMembersList = new ArrayList<>();
 
     private ValueEventListener valueEventListenerMembers;
     private DatabaseReference userRef;
 
     private FirebaseUser currentUser;
+
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +59,8 @@ public class GroupActivity extends AppCompatActivity {
         rvSelectedMembers = findViewById(R.id.rvSelectedMembers);
         rvMembers = findViewById(R.id.rvMembers);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Group");
+        toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("New Group");
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -67,6 +75,81 @@ public class GroupActivity extends AppCompatActivity {
         rvMembers.setLayoutManager(layoutManager);
         rvMembers.setHasFixedSize(true);
         rvMembers.setAdapter(contactAdapter);
+
+        rvMembers.addOnItemTouchListener(new RecyclerItemClickListener(
+                GroupActivity.this,
+                rvMembers,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        User selectedMember = memberList.get(position);
+
+                        memberList.remove(selectedMember);
+                        contactAdapter.notifyDataSetChanged();
+
+                        rvSelectedMembers.setVisibility(View.VISIBLE);
+                        selectedMembersList.add(selectedMember);
+
+                        selectedGroupAdapter.notifyDataSetChanged();
+
+                        updateToolbarMembers();
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+                }
+        ));
+
+        selectedGroupAdapter = new SelectedGroupAdapter(getApplicationContext(), selectedMembersList);
+
+        RecyclerView.LayoutManager layoutManagerSelectedMember = new LinearLayoutManager(
+                getApplicationContext(), LinearLayoutManager.HORIZONTAL, false
+        );
+
+        rvSelectedMembers.setLayoutManager(layoutManagerSelectedMember);
+        rvSelectedMembers.setHasFixedSize(true);
+        rvSelectedMembers.setAdapter(selectedGroupAdapter);
+
+        rvSelectedMembers.addOnItemTouchListener(new RecyclerItemClickListener(
+                GroupActivity.this,
+                rvSelectedMembers,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        User selectedUser = selectedMembersList.get(position);
+
+                        selectedMembersList.remove(selectedUser);
+                        selectedGroupAdapter.notifyItemRemoved(position);
+
+                        if (selectedMembersList.isEmpty()) {
+                            rvSelectedMembers.setVisibility(View.GONE);
+                        }
+
+                        memberList.add(selectedUser);
+                        contactAdapter.notifyDataSetChanged();
+
+                        updateToolbarMembers();
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+                }
+        ));
+
     }
 
     @Override
@@ -96,6 +179,7 @@ public class GroupActivity extends AppCompatActivity {
                     }
                 }
                 contactAdapter.notifyDataSetChanged();
+                updateToolbarMembers();
             }
 
             @Override
@@ -103,5 +187,11 @@ public class GroupActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void updateToolbarMembers() {
+        int totalSelected = selectedMembersList.size();
+        int total = memberList.size() + totalSelected;
+        toolbar.setSubtitle(totalSelected + " de " + total + " selected");
     }
 }
