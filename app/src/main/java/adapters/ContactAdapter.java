@@ -54,6 +54,9 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyViewHo
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         User user = contactList.get(position);
+
+        boolean isHeader = user.getEmail().isEmpty();
+
         holder.tvContactName.setText(user.getName());
         holder.tvContactEmail.setText(user.getEmail());
 
@@ -64,7 +67,13 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyViewHo
                     .load(url)
                     .into(holder.civContactImage);
         } else {
-            holder.civContactImage.setImageResource(R.drawable.padrao);
+            if (isHeader) {
+                holder.civContactImage.setImageResource(R.drawable.group_icon);
+                holder.tvContactEmail.setVisibility(View.GONE);
+            } else {
+                holder.civContactImage.setImageResource(R.drawable.padrao);
+                holder.tvContactEmail.setVisibility(View.VISIBLE);
+            }
         }
     }
 

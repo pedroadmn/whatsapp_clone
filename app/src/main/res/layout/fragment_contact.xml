@@ -5,6 +5,7 @@
     tools:context="fragments.ContactFragment">
 
 
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvContacts"
         android:layout_width="match_parent"

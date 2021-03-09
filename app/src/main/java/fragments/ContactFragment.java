@@ -21,6 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 import activities.ChatActivity;
+import activities.GroupActivity;
 import adapters.ContactAdapter;
 import config.FirebaseConfig;
 import helper.FirebaseUserHelper;
@@ -67,9 +68,18 @@ public class ContactFragment extends Fragment {
                     public void onItemClick(View view, int position) {
                         User selectedContact = contactList.get(position);
 
-                        Intent intent = new Intent(getActivity(), ChatActivity.class);
-                        intent.putExtra("chatContact", selectedContact);
-                        startActivity(intent);
+                        boolean isHeader = selectedContact.getEmail().isEmpty();
+
+                        if (isHeader) {
+                            Intent intent = new Intent(getActivity(), GroupActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(getActivity(), ChatActivity.class);
+                            intent.putExtra("chatContact", selectedContact);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                        }
                     }
 
                     @Override
@@ -83,6 +93,7 @@ public class ContactFragment extends Fragment {
                     }
                 }
         ));
+
         return view;
     }
 
@@ -103,6 +114,13 @@ public class ContactFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 contactList.clear();
+
+                User groupItem = new User();
+                groupItem.setName("New Group");
+                groupItem.setEmail("");
+
+                contactList.add(groupItem);
+
                 for (DataSnapshot data : snapshot.getChildren()) {
                     User user = data.getValue(User.class);
                     if (!currentUser.getEmail().equals(user.getEmail())) {
