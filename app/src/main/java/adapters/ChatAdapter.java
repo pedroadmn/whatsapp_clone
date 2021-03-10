@@ -63,6 +63,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             holder.tvMessage.setText(msg);
             holder.ivChatMessagePhoto.setVisibility(View.GONE);
         }
+
+        String name = message.getUserName();
+
+        if (!name.isEmpty()) {
+            holder.tvExhibitionName.setText(name);
+        } else {
+            holder.tvExhibitionName.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -86,11 +94,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
         ImageView ivChatMessagePhoto;
+        TextView tvExhibitionName;
 
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvChatMessage);
             ivChatMessagePhoto = itemView.findViewById(R.id.ivChatMessagePhoto);
+            tvExhibitionName = itemView.findViewById(R.id.tvExhibitionName);
         }
     }
 }

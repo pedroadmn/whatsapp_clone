@@ -49,6 +49,7 @@ public class ChatActivity extends AppCompatActivity {
     private CircleImageView civPhotoChat;
     private ImageView ivMessagePhoto;
     private User recipientUser;
+    private User senderUser;
     private EditText etMessage;
     private FloatingActionButton fabSendMessage;
 
@@ -84,6 +85,7 @@ public class ChatActivity extends AppCompatActivity {
         rvChatMessage = findViewById(R.id.rvChatMessages);
 
         senderUserId = FirebaseUserHelper.getUserId();
+        senderUser = FirebaseUserHelper.getLoggeduserInfo();
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("");
@@ -161,20 +163,25 @@ public class ChatActivity extends AppCompatActivity {
                 // Save message to recipient on firebase
                 saveMessage(recipientUserId, senderUserId, message);
 
-                saveTalk(message, false);
+                // Save talk to sender on firebase
+                saveTalk(senderUserId, recipientUserId, recipientUser, message, false);
+
+                // Save talk to recipient on firebase
+                saveTalk(recipientUserId, senderUserId, senderUser, message, false);
             } else {
                 for (User groupMember : group.getMembers()) {
-                    String senderGroupId = Base64Custom.encodeBase64(groupMember.getEmail());
+                    String groupSenderId = Base64Custom.encodeBase64(groupMember.getEmail());
                     String groupLoggedUserId = FirebaseUserHelper.getUserId();
 
                     Message message = new Message();
                     message.setUserId(groupLoggedUserId);
                     message.setMessage(textMessage);
+                    message.setUserName(senderUser.getName());
 
                     // Save message to sender on firebase
-                    saveMessage(senderGroupId, recipientUserId, message);
+                    saveMessage(groupSenderId, recipientUserId, message);
 
-                    saveTalk(message, true);
+                    saveTalk(groupSenderId, recipientUserId, recipientUser, message, true);
                 }
             }
         } else {
@@ -298,10 +305,10 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void saveTalk(Message message, boolean isGroup) {
+    private void saveTalk(String senderId, String recipientId, User exhibitionUser, Message message, boolean isGroup) {
         Talk talk = new Talk();
-        talk.setSenderId(senderUserId);
-        talk.setRecipientId(recipientUserId);
+        talk.setSenderId(senderId);
+        talk.setRecipientId(recipientId);
         talk.setLastMessage(message.getMessage());
 
         if (isGroup) {
@@ -309,7 +316,7 @@ public class ChatActivity extends AppCompatActivity {
             talk.setIsGroup("true");
         } else {
 
-            talk.setUser(recipientUser);
+            talk.setUser(exhibitionUser);
             talk.setIsGroup("false");
 
         }
