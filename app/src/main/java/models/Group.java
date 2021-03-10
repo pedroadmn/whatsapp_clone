@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import config.FirebaseConfig;
+import helper.Base64Custom;
 
 public class Group implements Serializable {
 
@@ -52,5 +53,26 @@ public class Group implements Serializable {
 
     public void setMembers(List<User> members) {
         this.members = members;
+    }
+
+    public void save() {
+        DatabaseReference firebaseRef = FirebaseConfig.getFirebaseDatabase();
+        DatabaseReference groupRef = firebaseRef.child("groups").child(getId());
+        groupRef.setValue(this);
+
+        for (User member : getMembers()) {
+
+            String senderId = Base64Custom.encodeBase64(member.getEmail());
+            String recipientId = getId();
+
+            Talk talk = new Talk();
+            talk.setSenderId(senderId);
+            talk.setRecipientId(recipientId);
+            talk.setLastMessage("");
+            talk.setIsGroup("true");
+            talk.setGroup(this);
+
+            talk.save();
+        }
     }
 }

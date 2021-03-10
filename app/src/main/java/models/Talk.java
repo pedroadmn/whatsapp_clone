@@ -12,7 +12,11 @@ public class Talk implements Serializable {
     private String lastMessage;
     private User user;
 
+    private String isGroup;
+    private Group group;
+
     public Talk() {
+        this.setIsGroup("false");
     }
 
     public String getSenderId() {
@@ -45,6 +49,22 @@ public class Talk implements Serializable {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getIsGroup() {
+        return isGroup;
+    }
+
+    public void setIsGroup(String isGroup) {
+        this.isGroup = isGroup;
+    }
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public void save() {

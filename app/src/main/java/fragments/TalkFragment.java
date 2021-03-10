@@ -81,7 +81,11 @@ public class TalkFragment extends Fragment {
                         Talk selectedTalk = talkList.get(position);
 
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
-                        intent.putExtra("chatContact", selectedTalk.getUser());
+                        if ("true".equals(selectedTalk.getIsGroup())) {
+                            intent.putExtra("chatGroup", selectedTalk.getGroup());
+                        } else {
+                            intent.putExtra("chatContact", selectedTalk.getUser());
+                        }
                         startActivity(intent);
                     }
 

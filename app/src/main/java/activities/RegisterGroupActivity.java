@@ -29,6 +29,7 @@ import java.util.List;
 import adapters.SelectedGroupAdapter;
 import config.FirebaseConfig;
 import de.hdodenhof.circleimageview.CircleImageView;
+import helper.FirebaseUserHelper;
 import models.Group;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
@@ -40,6 +41,7 @@ public class RegisterGroupActivity extends AppCompatActivity {
     private EditText etGroupName;
     private RecyclerView rvGroupMembers;
     private CircleImageView civGroupPhoto;
+    private FloatingActionButton fabSaveGroup;
 
     private SelectedGroupAdapter selectedGroupAdapter;
 
@@ -60,6 +62,7 @@ public class RegisterGroupActivity extends AppCompatActivity {
         etGroupName = findViewById(R.id.etGroupName);
         rvGroupMembers = findViewById(R.id.rvGroupMembers);
         civGroupPhoto = findViewById(R.id.civGroupPhoto);
+        fabSaveGroup = findViewById(R.id.fabSaveGroup);
 
         group = new Group();
 
@@ -88,6 +91,8 @@ public class RegisterGroupActivity extends AppCompatActivity {
         rvGroupMembers.setAdapter(selectedGroupAdapter);
 
         civGroupPhoto.setOnClickListener(v -> chooseGroupImage());
+
+        fabSaveGroup.setOnClickListener(v -> saveGroup());
     }
 
     private void chooseGroupImage() {
@@ -138,5 +143,18 @@ public class RegisterGroupActivity extends AppCompatActivity {
                 exception.printStackTrace();
             }
         }
+    }
+
+    private void saveGroup() {
+        String groupName = etGroupName.getText().toString();
+
+        selectedMembersList.add(FirebaseUserHelper.getLoggeduserInfo());
+
+        group.setName(groupName);
+        group.setMembers(selectedMembersList);
+
+        group.save();
+
+        finish();
     }
 }

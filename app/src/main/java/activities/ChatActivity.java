@@ -37,6 +37,7 @@ import config.FirebaseConfig;
 import de.hdodenhof.circleimageview.CircleImageView;
 import helper.Base64Custom;
 import helper.FirebaseUserHelper;
+import models.Group;
 import models.Message;
 import models.Talk;
 import models.User;
@@ -58,6 +59,7 @@ public class ChatActivity extends AppCompatActivity {
 
     private String senderUserId;
     private String recipientUserId;
+    private Group group;
 
     private DatabaseReference database;
     private DatabaseReference messageRef;
@@ -92,23 +94,41 @@ public class ChatActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
 
         if (bundle != null) {
-            recipientUser = (User) bundle.getSerializable("chatContact");
 
-            tvChatContactName.setText(recipientUser.getName());
+            if (bundle.containsKey("chatGroup")) {
+                group = (Group) bundle.getSerializable("chatGroup");
+                recipientUserId = group.getId();
+                tvChatContactName.setText(group.getName());
 
-            String photo = recipientUser.getPhoto();
+                String photo = group.getPhoto();
+                if (photo != null) {
+                    Uri url = Uri.parse(photo);
 
-            if (photo != null) {
-                Uri url = Uri.parse(photo);
-
-                Glide.with(this)
-                        .load(url)
-                        .into(civPhotoChat);
+                    Glide.with(this)
+                            .load(url)
+                            .into(civPhotoChat);
+                } else {
+                    civPhotoChat.setImageResource(R.drawable.padrao);
+                }
             } else {
-                civPhotoChat.setImageResource(R.drawable.padrao);
-            }
+                recipientUser = (User) bundle.getSerializable("chatContact");
 
-            recipientUserId = Base64Custom.encodeBase64(recipientUser.getEmail());
+                tvChatContactName.setText(recipientUser.getName());
+
+                String photo = recipientUser.getPhoto();
+
+                if (photo != null) {
+                    Uri url = Uri.parse(photo);
+
+                    Glide.with(this)
+                            .load(url)
+                            .into(civPhotoChat);
+                } else {
+                    civPhotoChat.setImageResource(R.drawable.padrao);
+                }
+
+                recipientUserId = Base64Custom.encodeBase64(recipientUser.getEmail());
+            }
         }
 
         chatAdapter = new ChatAdapter(this, messages);

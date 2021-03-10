@@ -15,6 +15,7 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import models.Group;
 import models.Talk;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
@@ -55,17 +56,34 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
         Talk talk = talkList.get(position);
         User exhibitionUser = talk.getUser();
-        holder.tvTalkContactName.setText(exhibitionUser.getName());
+
         holder.tvTalkLastMessage.setText(talk.getLastMessage());
 
-        if(exhibitionUser.getPhoto() != null) {
-            Uri url = Uri.parse(exhibitionUser.getPhoto());
+        if ("true".equals(talk.getIsGroup())) {
+            Group group = talk.getGroup();
+            holder.tvTalkContactName.setText(group.getName());
 
-            Glide.with(context)
-                    .load(url)
-                    .into(holder.civTalkContactImage);
+            if(group.getPhoto() != null) {
+                Uri url = Uri.parse(group.getPhoto());
+
+                Glide.with(context)
+                        .load(url)
+                        .into(holder.civTalkContactImage);
+            } else {
+                holder.civTalkContactImage.setImageResource(R.drawable.padrao);
+            }
         } else {
-            holder.civTalkContactImage.setImageResource(R.drawable.padrao);
+            holder.tvTalkContactName.setText(exhibitionUser.getName());
+
+            if(exhibitionUser.getPhoto() != null) {
+                Uri url = Uri.parse(exhibitionUser.getPhoto());
+
+                Glide.with(context)
+                        .load(url)
+                        .into(holder.civTalkContactImage);
+            } else {
+                holder.civTalkContactImage.setImageResource(R.drawable.padrao);
+            }
         }
     }
 
