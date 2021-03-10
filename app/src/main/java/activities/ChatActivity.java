@@ -150,17 +150,33 @@ public class ChatActivity extends AppCompatActivity {
         String textMessage = etMessage.getText().toString();
 
         if (!textMessage.isEmpty()) {
-            Message message = new Message();
-            message.setUserId(senderUserId);
-            message.setMessage(textMessage);
+            if (recipientUser != null) {
+                Message message = new Message();
+                message.setUserId(senderUserId);
+                message.setMessage(textMessage);
 
-            // Save message to sender on firebase
-            saveMessage(senderUserId, recipientUserId, message);
+                // Save message to sender on firebase
+                saveMessage(senderUserId, recipientUserId, message);
 
-            // Save message to recipient on firebase
-            saveMessage(recipientUserId, senderUserId, message);
+                // Save message to recipient on firebase
+                saveMessage(recipientUserId, senderUserId, message);
 
-            saveTalk(message);
+                saveTalk(message, false);
+            } else {
+                for (User groupMember : group.getMembers()) {
+                    String senderGroupId = Base64Custom.encodeBase64(groupMember.getEmail());
+                    String groupLoggedUserId = FirebaseUserHelper.getUserId();
+
+                    Message message = new Message();
+                    message.setUserId(groupLoggedUserId);
+                    message.setMessage(textMessage);
+
+                    // Save message to sender on firebase
+                    saveMessage(senderGroupId, recipientUserId, message);
+
+                    saveTalk(message, true);
+                }
+            }
         } else {
             Toast.makeText(this, "Type a message to send.", Toast.LENGTH_SHORT).show();
         }
@@ -282,12 +298,21 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    private void saveTalk(Message message) {
+    private void saveTalk(Message message, boolean isGroup) {
         Talk talk = new Talk();
         talk.setSenderId(senderUserId);
         talk.setRecipientId(recipientUserId);
         talk.setLastMessage(message.getMessage());
-        talk.setUser(recipientUser);
+
+        if (isGroup) {
+            talk.setGroup(group);
+            talk.setIsGroup("true");
+        } else {
+
+            talk.setUser(recipientUser);
+            talk.setIsGroup("false");
+
+        }
         talk.save();
     }
 }

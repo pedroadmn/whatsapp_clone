@@ -73,16 +73,20 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.MyViewHolder> 
                 holder.civTalkContactImage.setImageResource(R.drawable.padrao);
             }
         } else {
-            holder.tvTalkContactName.setText(exhibitionUser.getName());
+            User user = talk.getUser();
 
-            if(exhibitionUser.getPhoto() != null) {
-                Uri url = Uri.parse(exhibitionUser.getPhoto());
+            if (user != null) {
+                holder.tvTalkContactName.setText(exhibitionUser.getName());
 
-                Glide.with(context)
-                        .load(url)
-                        .into(holder.civTalkContactImage);
-            } else {
-                holder.civTalkContactImage.setImageResource(R.drawable.padrao);
+                if(exhibitionUser.getPhoto() != null) {
+                    Uri url = Uri.parse(exhibitionUser.getPhoto());
+
+                    Glide.with(context)
+                            .load(url)
+                            .into(holder.civTalkContactImage);
+                } else {
+                    holder.civTalkContactImage.setImageResource(R.drawable.padrao);
+                }
             }
         }
     }
