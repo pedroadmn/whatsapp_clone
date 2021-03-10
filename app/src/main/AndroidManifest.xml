@@ -17,6 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name="activities.RegisterGroupActivity"
+            android:parentActivityName="activities.GroupActivity" />
+        <activity
             android:name="activities.GroupActivity"
             android:parentActivityName="activities.MainActivity" />
         <activity

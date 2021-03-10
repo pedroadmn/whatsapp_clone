@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,8 @@ public class GroupActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
 
+    private FloatingActionButton fabGoRegisterGroup;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,9 +68,8 @@ public class GroupActivity extends AppCompatActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        fabGoRegisterGroup = findViewById(R.id.fabGoRegisterGroup);
+        fabGoRegisterGroup.setOnClickListener(view -> goToRegisterGroup());
 
         contactAdapter = new ContactAdapter(getApplicationContext(), memberList);
 
@@ -193,5 +195,11 @@ public class GroupActivity extends AppCompatActivity {
         int totalSelected = selectedMembersList.size();
         int total = memberList.size() + totalSelected;
         toolbar.setSubtitle(totalSelected + " de " + total + " selected");
+    }
+
+    private void goToRegisterGroup() {
+        Intent intent = new Intent(this, RegisterGroupActivity.class);
+        intent.putExtra("selectedMembers", (Serializable) selectedMembersList);
+        startActivity(intent);
     }
 }
