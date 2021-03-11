@@ -203,6 +203,8 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getMessages() {
+        messages.clear();
+
         childEventListenerMessages = messageRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -292,13 +294,32 @@ public class ChatActivity extends AppCompatActivity {
                             Toast.makeText(ChatActivity.this, "Photo Successfully uploaded", Toast.LENGTH_SHORT).show();
                             imageRef.getDownloadUrl().addOnCompleteListener(task -> {
                                 Uri url = task.getResult();
-                                Message message = new Message();
-                                message.setUserId(senderUserId);
-                                message.setMessage("image.jpeg");
-                                message.setImage(url.toString());
 
-                                saveMessage(senderUserId, recipientUserId, message);
-                                saveMessage(recipientUserId, senderUserId, message);
+                                if (recipientUser != null) {
+                                    Message message = new Message();
+                                    message.setUserId(senderUserId);
+                                    message.setMessage("image.jpeg");
+                                    message.setImage(url.toString());
+
+                                    saveMessage(senderUserId, recipientUserId, message);
+                                    saveMessage(recipientUserId, senderUserId, message);
+                                } else {
+                                    for (User groupMember : group.getMembers()) {
+                                        String groupSenderId = Base64Custom.encodeBase64(groupMember.getEmail());
+                                        String groupLoggedUserId = FirebaseUserHelper.getUserId();
+
+                                        Message message = new Message();
+                                        message.setUserId(groupLoggedUserId);
+                                        message.setMessage("image.jpeg");
+                                        message.setUserName(senderUser.getName());
+                                        message.setImage(url.toString());
+
+                                        // Save message to sender on firebase
+                                        saveMessage(groupSenderId, recipientUserId, message);
+
+                                        saveTalk(groupSenderId, recipientUserId, recipientUser, message, true);
+                                    }
+                                }
                             });
                         });
             }

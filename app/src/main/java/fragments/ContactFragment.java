@@ -19,13 +19,16 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import activities.ChatActivity;
 import activities.GroupActivity;
 import adapters.ContactAdapter;
+import adapters.TalkAdapter;
 import config.FirebaseConfig;
 import helper.FirebaseUserHelper;
 import helper.RecyclerItemClickListener;
+import models.Talk;
 import models.User;
 import pedroadmn.whatsappclone.com.R;
 
@@ -66,7 +69,9 @@ public class ContactFragment extends Fragment {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        User selectedContact = contactList.get(position);
+                        List<User> updatedContactList = contactAdapter.getContactList();
+
+                        User selectedContact = updatedContactList.get(position);
 
                         boolean isHeader = selectedContact.getEmail().isEmpty();
 
@@ -135,5 +140,26 @@ public class ContactFragment extends Fragment {
 
             }
         });
+    }
+
+    public void searchContacts(String searchText) {
+        List<User> searchUserList = new ArrayList<>();
+
+        for (User user : contactList) {
+            String name = user.getName().toLowerCase();
+            if (name.contains(searchText)) {
+                searchUserList.add(user);
+            }
+        }
+
+        contactAdapter = new ContactAdapter(getActivity(), searchUserList);
+        rvContacts.setAdapter(contactAdapter);
+        contactAdapter.notifyDataSetChanged();
+    }
+
+    public void reloadTalks() {
+        contactAdapter = new ContactAdapter(getActivity(), contactList);
+        rvContacts.setAdapter(contactAdapter);
+        contactAdapter.notifyDataSetChanged();
     }
 }

@@ -58,6 +58,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
                     .load(url)
                     .into(holder.ivChatMessagePhoto);
 
+            holder.ivChatMessagePhoto.setVisibility(View.VISIBLE);
             holder.tvMessage.setVisibility(View.GONE);
         } else {
             holder.tvMessage.setText(msg);

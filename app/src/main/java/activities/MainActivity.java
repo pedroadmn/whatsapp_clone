@@ -75,10 +75,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                TalkFragment talkFragment = (TalkFragment) fragmentAdapter.getPage(0);
-
-                if (newText != null && !newText.isEmpty()) {
-                    talkFragment.searchTalks(newText.toLowerCase());
+                switch (viewPager.getCurrentItem()) {
+                    case 0:
+                        TalkFragment talkFragment = (TalkFragment) fragmentAdapter.getPage(0);
+                        if (newText != null && !newText.isEmpty()) {
+                            talkFragment.searchTalks(newText.toLowerCase());
+                        } else {
+                            talkFragment.reloadTalks();
+                        }
+                        break;
+                    case 1:
+                        ContactFragment contactFragment = (ContactFragment) fragmentAdapter.getPage(1);
+                        if (newText != null && !newText.isEmpty()) {
+                            contactFragment.searchContacts(newText.toLowerCase());
+                        } else {
+                            contactFragment.reloadTalks();
+                        }
+                        break;
                 }
 
                 return true;

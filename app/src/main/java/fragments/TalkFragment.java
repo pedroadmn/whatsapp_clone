@@ -78,7 +78,9 @@ public class TalkFragment extends Fragment {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Talk selectedTalk = talkList.get(position);
+
+                        List<Talk> updatedTalkList = talkAdapter.getTalks();
+                        Talk selectedTalk = updatedTalkList.get(position);
 
                         Intent intent = new Intent(getActivity(), ChatActivity.class);
                         if ("true".equals(selectedTalk.getIsGroup())) {
@@ -104,6 +106,8 @@ public class TalkFragment extends Fragment {
     }
 
     private void getTalks() {
+        talkList.clear();
+
         childEventListenerTalks = talkRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
@@ -152,8 +156,13 @@ public class TalkFragment extends Fragment {
         List<Talk> searchTalkList = new ArrayList<>();
 
         for (Talk talk : talkList) {
-            String name = talk.getUser().getName().toLowerCase();
+            String name = "";
             String lastMessage = talk.getLastMessage().toLowerCase();
+            if (talk.getUser() != null) {
+                name = talk.getUser().getName().toLowerCase();
+            } else {
+                name = talk.getGroup().getName().toLowerCase();
+            }
 
             if (name.contains(searchText) || lastMessage.contains(searchText)) {
                 searchTalkList.add(talk);

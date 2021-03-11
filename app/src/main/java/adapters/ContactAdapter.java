@@ -28,6 +28,10 @@ public class ContactAdapter extends RecyclerView.Adapter<ContactAdapter.MyViewHo
         this.context = context;
     }
 
+    public List<User> getContactList() {
+        return this.contactList;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView civContactImage;

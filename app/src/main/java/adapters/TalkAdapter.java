@@ -30,6 +30,10 @@ public class TalkAdapter extends RecyclerView.Adapter<TalkAdapter.MyViewHolder> 
         this.context = context;
     }
 
+    public List<Talk> getTalks() {
+        return this.talkList;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         CircleImageView civTalkContactImage;
